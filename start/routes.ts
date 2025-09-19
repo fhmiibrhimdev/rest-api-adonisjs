@@ -37,3 +37,24 @@ router.group(() => {
 router.group(() => {
   router.resource('todos', '#controllers/todos_controller').apiOnly()
 }).prefix('/api').use([middleware.auth(), middleware.admin()])
+
+// Example: Routes with different role access levels
+router.group(() => {
+  // Admin only routes
+  router.group(() => {
+    router.get('/admin/dashboard', async () => ({ message: 'Admin Dashboard' }))
+    router.get('/admin/users', async () => ({ message: 'All Users' }))
+  }).use(middleware.admin())
+  
+  // Moderator and Admin routes
+  router.group(() => {
+    router.get('/moderate/reports', async () => ({ message: 'Reports for moderation' }))
+    router.post('/moderate/ban-user', async () => ({ message: 'User banned' }))
+  }).use(middleware.moderator())
+  
+  // Multiple specific roles using roles middleware
+  router.group(() => {
+    router.get('/special/feature', async () => ({ message: 'Special feature for admin and moderator' }))
+  }).use(middleware.roles(['admin', 'moderator']))
+  
+}).prefix('/api').use(middleware.auth())
