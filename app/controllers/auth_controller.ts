@@ -28,15 +28,25 @@ export default class AuthController {
         isActive: true, // Default active
       })
 
-      // Generate access token
-      const token = await User.accessTokens.create(user)
+      // Generate access token with 24 hours expiry
+      const token = await User.accessTokens.create(user, ['*'], {
+        expiresIn: '24 hours'
+      })
+
+      // Calculate expiry in local timezone for display
+      const expiresAtLocal = token.expiresAt ? 
+        DateTime.fromJSDate(token.expiresAt).setZone('Asia/Jakarta') : null
 
       return response.status(201).json({
         success: true,
         message: 'User registered successfully',
         data: {
           user: user.serialize(),
-          token: token,
+          token: {
+            ...token.toJSON(),
+            expiresAtLocal: expiresAtLocal?.toISO(),
+            expiresAtDisplay: expiresAtLocal?.toFormat('dd/MM/yyyy HH:mm:ss') + ' WIB'
+          },
         },
       })
     } catch (error) {
@@ -66,15 +76,25 @@ export default class AuthController {
         })
       }
 
-      // Generate access token
-      const token = await User.accessTokens.create(user)
+      // Generate access token with 24 hours expiry
+      const token = await User.accessTokens.create(user, ['*'], {
+        expiresIn: '24 hours'
+      })
+
+      // Calculate expiry in local timezone for display
+      const expiresAtLocal = token.expiresAt ? 
+        DateTime.fromJSDate(token.expiresAt).setZone('Asia/Jakarta') : null
 
       return response.json({
         success: true,
         message: 'Login successful',
         data: {
           user: user.serialize(),
-          token: token,
+          token: {
+            ...token.toJSON(),
+            expiresAtLocal: expiresAtLocal?.toISO(),
+            expiresAtDisplay: expiresAtLocal?.toFormat('dd/MM/yyyy HH:mm:ss') + ' WIB'
+          },
         },
       })
     } catch (error) {
@@ -119,14 +139,24 @@ export default class AuthController {
         await User.accessTokens.delete(auth.user!, currentToken.identifier)
       }
       
-      // Generate new token
-      const token = await User.accessTokens.create(user)
+      // Generate new token with 24 hours expiry
+      const token = await User.accessTokens.create(user, ['*'], {
+        expiresIn: '24 hours'
+      })
+
+      // Calculate expiry in local timezone for display
+      const expiresAtLocal = token.expiresAt ? 
+        DateTime.fromJSDate(token.expiresAt).setZone('Asia/Jakarta') : null
 
       return response.json({
         success: true,
         message: 'Token refreshed successfully',
         data: {
-          token: token,
+          token: {
+            ...token.toJSON(),
+            expiresAtLocal: expiresAtLocal?.toISO(),
+            expiresAtDisplay: expiresAtLocal?.toFormat('dd/MM/yyyy HH:mm:ss') + ' WIB'
+          },
         },
       })
     } catch (error) {

@@ -55,7 +55,7 @@ npm install
 Create a `.env` file in the root directory:
 
 ```env
-TZ=UTC
+TZ=Asia/Jakarta
 PORT=3333
 HOST=localhost
 LOG_LEVEL=info
