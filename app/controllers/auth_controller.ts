@@ -65,8 +65,25 @@ export default class AuthController {
     try {
       const { email, password } = await request.validateUsing(loginValidator)
 
-      // Find user by email
-      const user = await User.verifyCredentials(email, password)
+      // First, check if user exists by email
+      const user = await User.findBy('email', email)
+      
+      if (!user) {
+        return response.status(401).json({
+          success: false,
+          message: 'Email tidak terdaftar',
+        })
+      }
+
+      // Check if password is correct
+      const isPasswordValid = await hash.verify(user.password, password)
+      
+      if (!isPasswordValid) {
+        return response.status(401).json({
+          success: false,
+          message: 'Password salah',
+        })
+      }
 
       // Check if user is active
       if (!user.isActive) {
@@ -98,9 +115,10 @@ export default class AuthController {
         },
       })
     } catch (error) {
-      return response.status(401).json({
+      return response.status(500).json({
         success: false,
-        message: 'Invalid credentials',
+        message: 'Login failed',
+        errors: error.messages || error.message,
       })
     }
   }

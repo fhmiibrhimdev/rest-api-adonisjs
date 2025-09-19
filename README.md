@@ -130,6 +130,27 @@ Content-Type: application/json
 }
 ```
 
+**Error Responses:**
+```json
+// Email tidak terdaftar
+{
+    "success": false,
+    "message": "Email tidak terdaftar"
+}
+
+// Password salah
+{
+    "success": false,
+    "message": "Password salah"
+}
+
+// Akun tidak aktif
+{
+    "success": false,
+    "message": "Account is deactivated. Please contact support."
+}
+```
+
 #### Get Current User
 ```http
 GET /api/me
