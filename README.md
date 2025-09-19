@@ -27,6 +27,11 @@ A complete REST API built with AdonisJS v6 featuring authentication, multi-role 
   - Todos management (Create, Read, Update, Delete)
   - Protected by admin middleware
 
+- **Dashboard**
+  - Universal access for all authenticated users
+  - Role-specific feature display
+  - Personalized welcome messages
+
 ## 📋 Requirements
 
 - **Node.js** >= 18.0.0
@@ -171,6 +176,47 @@ Content-Type: application/json
 }
 ```
 
+### Dashboard Endpoint
+
+#### Get Dashboard
+```http
+GET /api/dashboard
+Authorization: Bearer {token}
+```
+
+**Response Example:**
+```json
+{
+    "success": true,
+    "message": "Welcome to dashboard, John Doe!",
+    "data": {
+        "user": {
+            "id": 1,
+            "fullName": "John Doe",
+            "email": "john@example.com",
+            "role": "admin",
+            "isActive": 1
+        },
+        "dashboard": {
+            "message": "Dashboard accessible for all authenticated users",
+            "userRole": "admin",
+            "accessLevel": "authenticated",
+            "features": [
+                "User Management",
+                "Todos CRUD",
+                "System Settings",
+                "Analytics"
+            ]
+        }
+    }
+}
+```
+
+**Features by Role:**
+- **Admin**: User Management, Todos CRUD, System Settings, Analytics
+- **Moderator**: Content Moderation, User Reports, Analytics
+- **User**: Profile Management, Basic Features
+
 ### Admin-Only Todos Endpoints
 
 > **Note:** All todos endpoints require admin role
@@ -228,11 +274,20 @@ Authorization: Bearer {admin_token}
 4. Use `/api/refresh` to get a new token when needed
 5. Use `/api/logout` to invalidate the current token
 
-## 👥 User Roles
+## 👥 User Roles & Dashboard Access
 
-- **admin**: Full access to all endpoints including todos CRUD
-- **moderator**: Access to authentication endpoints only
-- **user**: Access to authentication endpoints only (default role)
+- **admin**: Full access to all endpoints including todos CRUD + Dashboard with complete features
+- **moderator**: Access to authentication endpoints + Dashboard with moderation features
+- **user**: Access to authentication endpoints + Dashboard with basic features (default role)
+
+### Dashboard Features by Role
+
+| Role | Dashboard Access | Features Available |
+|------|------------------|-------------------|
+| **Admin** | ✅ | User Management, Todos CRUD, System Settings, Analytics |
+| **Moderator** | ✅ | Content Moderation, User Reports, Analytics |
+| **User** | ✅ | Profile Management, Basic Features |
+| **Unauthenticated** | ❌ | No access |
 
 ## 📝 Response Format
 
@@ -264,6 +319,14 @@ Authorization: Bearer {admin_token}
 Create a Postman environment with:
 - `base_url`: `http://localhost:3333/api`
 - `token`: (will be auto-populated by scripts)
+
+### Testing Dashboard
+The dashboard endpoint is perfect for testing role-based features:
+
+1. **Register/Login** as different roles (admin, moderator, user)
+2. **Save token** using the script below
+3. **Access dashboard** to see role-specific features
+4. **Compare responses** between different roles
 
 ### Auto-Save Token Script
 Add this script to the **Tests** tab of login/register requests:
